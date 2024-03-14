@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include "alg_lin.h"
 
-#define ROWS 2
-#define COLUMNS 2
+#define ROWS 3
+#define COLUMNS 3
 
 int main(int argc, char const *argv[]) {
     int **m1 = NULL;
@@ -14,7 +14,9 @@ int main(int argc, char const *argv[]) {
     show_matrix(m1, ROWS, COLUMNS);
 
     int **m2 = NULL;
-    create_identity(&m2, ROWS, COLUMNS);
+    create_matrix(&m2, ROWS, COLUMNS);
+    printf("Set the m2 matrix\n");
+    set_matrix(m2, ROWS, COLUMNS);
     printf("m2 matrix:\n");
     show_matrix(m2, ROWS, COLUMNS);
 
@@ -38,7 +40,16 @@ int main(int argc, char const *argv[]) {
     transpose(&m3, &m3_t, ROWS, COLUMNS);
     printf("transpose of m3 matrix:\n");
     show_matrix(m3_t, COLUMNS, ROWS);
+
+    free_matrix(m3, COLUMNS);
     free_matrix(m3_t, COLUMNS);
+
+    int **identity = NULL;
+    create_identity(&identity, ROWS, COLUMNS);
+    printf("Identity of a matrix %dx%d:\n", ROWS, COLUMNS);
+    show_matrix(identity, ROWS, COLUMNS);
+
+    free_matrix(identity, ROWS);
 
     return 0;
 }
