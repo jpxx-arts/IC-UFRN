@@ -1,0 +1,2 @@
+- Para compilar, escreva: gcc *.c -o out
+- Para executar, escreva: ./out
