@@ -7,28 +7,46 @@ int create_matrix(int ***matrix, int rows, int columns);
 void free_matrix(int **matrix, int rows);
 void set_matrix(int **matrix, int rows, int columns);
 int create_identity(int ***matrix, int rows, int columns);
-void show_matrix(int **matrix);
+void show_matrix(int **matrix, int rows, int columns);
 int multiply_matrices(int **m1, int **m2, int **res, int m1R, int m1C, int m2R, int m2C);
 int get_element(int **m1, int **m2, int row, int column);
+int transpose(int ***matrix, int ***transpose_of, int rows_original, int columns_original);
 
 int main(int argc, char const *argv[]) {
     int **m1 = NULL;
     create_matrix(&m1, ROWS, COLUMNS);
+    printf("Set the m1 matrix\n");
     set_matrix(m1, ROWS, COLUMNS);
-    show_matrix(m1);
+    printf("m1 matrix:\n");
+    show_matrix(m1, ROWS, COLUMNS);
 
     int **m2 = NULL;
     create_identity(&m2, ROWS, COLUMNS);
-    show_matrix(m2);
+    printf("m2 matrix:\n");
+    show_matrix(m2, ROWS, COLUMNS);
 
     int **res = NULL;
     create_matrix(&res, ROWS, COLUMNS);
     multiply_matrices(m1, m2, res, ROWS, COLUMNS, ROWS, COLUMNS);
-    show_matrix(res);
+    printf("Multiplication result:\n");
+    show_matrix(res, ROWS, COLUMNS);
 
     free_matrix(m1, ROWS);
     free_matrix(m2, ROWS);
     free_matrix(res, ROWS);
+
+    int **m3 = NULL;
+    create_matrix(&m3, ROWS, COLUMNS);
+    printf("Set the m3 matrix\n");
+    set_matrix(m3, ROWS, COLUMNS);
+    printf("m3 matrix:\n");
+    show_matrix(m3, ROWS, COLUMNS);
+    int **m3_t = NULL;
+    transpose(&m3, &m3_t, ROWS, COLUMNS);
+    printf("transpose of m3 matrix:\n");
+    show_matrix(m3_t, COLUMNS, ROWS);
+    free_matrix(m3_t, COLUMNS);
+
     return 0;
 }
 
@@ -89,9 +107,9 @@ int create_identity(int ***matrix, int rows, int columns) {
     return 0;
 }
 
-void show_matrix(int **matrix) {
-    for (int i = 0; i < ROWS; i++) {
-        for (int j = 0; j < COLUMNS; j++) {
+void show_matrix(int **matrix, int rows, int columns) {
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < columns; j++) {
             printf("%d ", matrix[i][j]);
         }
         printf("\n");
@@ -119,4 +137,18 @@ int multiply_matrices(int **m1, int **m2, int **res, int m1R, int m1C, int m2R, 
         printf("Multiplication Impossible");
         return -1;
     }
+}
+
+int transpose(int ***matrix, int ***transpose_of, int rows_original, int columns_original){
+    int valid = create_matrix(transpose_of, columns_original, rows_original);
+    if (valid < 0)
+        return -1;
+
+    for (int i = 0; i < columns_original; i++) {
+        for (int j = 0; j < rows_original; j++) {
+            (*transpose_of)[i][j] = (*matrix)[j][i];
+        }
+    }
+
+    return 0;
 }
