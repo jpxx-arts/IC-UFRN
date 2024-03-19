@@ -9,5 +9,6 @@ void show_matrix(int **matrix, int rows, int columns);
 int multiply_matrices(int **m1, int **m2, int **res, int m1R, int m1C, int m2R, int m2C);
 int get_element(int **m1, int **m2, int row, int column, int tam);
 int transpose(int ***matrix, int ***transpose_of, int rows_original, int columns_original);
+void auto_fill(int ***matrix, int rows, int columns, int seed);
 
 #endif

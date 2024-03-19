@@ -66,7 +66,7 @@ int create_identity(int ***matrix, int rows, int columns) {
         return -2;
     }
 
-    #pragma omp parallel for
+    #pragma omp parallel for collapse(2)
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j++) {
             (*matrix)[i][j] = (i == j);
@@ -87,10 +87,10 @@ void show_matrix(int **matrix, int rows, int columns) {
 }
 
 int get_element(int **m1, int **m2, int row, int column, int tam) {
-    int sum = 0, i = 0;
+    int sum = 0, x;
 
-    #pragma omp parallel for private(i) reduction(+ : sum)
-    for (int x = 0; x < tam; x++) {
+    #pragma omp parallel for private(x) reduction(+ : sum)
+    for (x = 0; x < tam; x++) {
         sum += m1[row][x] * m2[x][column];
     }
 
@@ -99,7 +99,7 @@ int get_element(int **m1, int **m2, int row, int column, int tam) {
 
 int multiply_matrices(int **m1, int **m2, int **res, int m1R, int m1C, int m2R, int m2C) {
     if (m1C == m2R) {
-        #pragma omp parallel for
+        #pragma omp parallel for collapse(2)
         for (int i = 0; i < m1R; i++) {
             for (int j = 0; j < m2C; j++) {
                 res[i][j] = get_element(m1, m2, i, j, m1C);
@@ -117,7 +117,7 @@ int transpose(int ***matrix, int ***transpose_of, int rows_original, int columns
     if (valid < 0)
         return -1;
 
-    #pragma omp parallel for
+    #pragma omp parallel for collapse(2)
     for (int i = 0; i < columns_original; i++) {
         for (int j = 0; j < rows_original; j++) {
             (*transpose_of)[i][j] = (*matrix)[j][i];
@@ -125,4 +125,17 @@ int transpose(int ***matrix, int ***transpose_of, int rows_original, int columns
     }
 
     return 0;
+}
+
+void auto_fill(int ***matrix, int rows, int columns, int seed){
+    srand(seed);
+    int element = rand() % 10;
+
+    #pragma omp parallel for collapse(2)
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < columns; j++) {
+            (*matrix)[i][j] = element;
+            element = rand() % 10;
+        }
+    }
 }

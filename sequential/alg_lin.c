@@ -104,3 +104,15 @@ int transpose(int ***matrix, int ***transpose_of, int rows_original, int columns
 
     return 0;
 }
+
+void auto_fill(int ***matrix, int rows, int columns, int seed){
+    srand(seed);
+    int element = rand() % 10;
+
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < columns; j++) {
+            (*matrix)[i][j] = element;
+            element = rand() % 10;
+        }
+    }
+}
