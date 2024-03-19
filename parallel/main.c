@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <omp.h>
+#include <time.h>
 
 #define ROWS 3
 #define COLUMNS 3
@@ -15,6 +16,8 @@ int get_element(int **m1, int **m2, int row, int column, int tam);
 int transpose(int ***matrix, int ***transpose_of, int rows_original, int columns_original);
 
 int main() {
+    clock_t begin = clock();
+
     int **m1 = NULL;
     create_matrix(&m1, ROWS, COLUMNS);
     printf("Set the m1 matrix\n");
@@ -59,6 +62,10 @@ int main() {
     show_matrix(identity, ROWS, COLUMNS);
 
     free_matrix(identity, ROWS);
+
+    clock_t end = clock();
+    double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+    printf("%f\n", time_spent);
 
     return 0;
 }
