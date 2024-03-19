@@ -1,11 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include "alg_lin.h"
 
 #define ROWS 3
 #define COLUMNS 3
 
 int main(int argc, char const *argv[]) {
+    clock_t begin = clock();
+    
     int **m1 = NULL;
     create_matrix(&m1, ROWS, COLUMNS);
     printf("Set the m1 matrix\n");
@@ -50,6 +53,10 @@ int main(int argc, char const *argv[]) {
     show_matrix(identity, ROWS, COLUMNS);
 
     free_matrix(identity, ROWS);
+
+    clock_t end = clock();
+    double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+    printf("%f\n", time_spent);
 
     return 0;
 }
