@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "alg_lin.h"
 
 int create_matrix(int ***matrix, int rows, int columns) {
     *matrix = (int **)malloc(rows * sizeof(int *));

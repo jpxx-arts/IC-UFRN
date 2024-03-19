@@ -3,8 +3,8 @@
 #include <time.h>
 #include "alg_lin.h"
 
-#define ROWS 5000
-#define COLUMNS 5000
+#define ROWS 1000
+#define COLUMNS 1000
 
 int main(int argc, char const *argv[]) {
     clock_t begin = clock();
@@ -12,20 +12,14 @@ int main(int argc, char const *argv[]) {
     int **m1 = NULL;
     create_matrix(&m1, ROWS, COLUMNS);
     auto_fill(&m1, ROWS, COLUMNS, 1);
-    printf("matrix m1:\n");
-    show_matrix(m1, ROWS, COLUMNS);
 
     int **m2 = NULL;
     create_matrix(&m2, ROWS, COLUMNS);
     auto_fill(&m2, ROWS, COLUMNS, 2);
-    printf("matrix m2:\n");
-    show_matrix(m2, ROWS, COLUMNS);
 
     int **res = NULL;
     create_matrix(&res, ROWS, COLUMNS);
     multiply_matrices(m1, m2, res, ROWS, COLUMNS, ROWS, COLUMNS);
-    printf("Matrix multiplication between m1 and m2:\n");
-    show_matrix(res, ROWS, COLUMNS);
 
     free_matrix(m1, ROWS);
     free_matrix(m2, ROWS);
