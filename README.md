@@ -4,7 +4,7 @@ foo@bar:~$ gcc *.c -o out
 ```
 - Para executar:
 ```console
-foo@bar:~$ gcc *.c -o out
+foo@bar:~$ ./out
 ```
 
 - Para compilar na versão paralela:
@@ -14,5 +14,5 @@ foo@bar:~$ gcc -fopenmp *.c -o out
 
 - Para executar:
 ```console
-foo@bar:~$ gcc *.c -o out
+foo@bar:~$ gcc ./out
 ```
