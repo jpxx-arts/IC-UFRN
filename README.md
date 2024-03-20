@@ -1,2 +1,18 @@
-- Para compilar, escreva: gcc *.c -o out
-- Para executar, escreva: ./out
+- Para compilar na versão sequencial:
+```console
+foo@bar:~$ gcc *.c -o out
+```
+- Para executar:
+```console
+foo@bar:~$ gcc *.c -o out
+```
+
+- Para compilar na versão paralela:
+```console
+foo@bar:~$ gcc -fopenmp *.c -o out
+```
+
+- Para executar:
+```console
+foo@bar:~$ gcc *.c -o out
+```
