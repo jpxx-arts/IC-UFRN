@@ -14,5 +14,5 @@ foo@bar:~$ gcc -fopenmp *.c -o out
 
 - Para executar:
 ```console
-foo@bar:~$ gcc ./out
+foo@bar:~$ ./out
 ```
