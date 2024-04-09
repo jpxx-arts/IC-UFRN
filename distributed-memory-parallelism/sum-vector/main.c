@@ -5,7 +5,6 @@
 int create_vector(int **vector, int vector_size);
 int free_vector(int *vector);
 void fill_vector(int **vector, int vector_size, int seed);
-int sum_vector(int *vector, int start, int end);
 
 int main(int argc, char **argv){
     if(argc != 2)
@@ -68,14 +67,4 @@ void fill_vector(int **vector, int vector_size, int seed){
     for(int i = 0; i < vector_size; i++){
         (*vector)[i] = rand()%10;
     }
-}
-
-int sum_vector(int *vector, int start, int end){
-    int sum = 0;
-
-    for(int i = start; i < end; i++){
-        sum += vector[i];
-    }   
-
-    return sum;
 }
