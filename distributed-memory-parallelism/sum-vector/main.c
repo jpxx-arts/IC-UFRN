@@ -20,6 +20,10 @@ int main(int argc, char **argv){
     MPI_Status status;
 
     MPI_Init(&argc, &argv);
+    double start_time, end_time;
+    if(rank == 0){
+        start_time = MPI_Wtime(); 
+    }
 
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
@@ -35,12 +39,16 @@ int main(int argc, char **argv){
 
     MPI_Reduce(&local_sum, &sum, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
 
-    if(rank == 0)
+    if(rank == 0){
         printf("Vector's sum: %d\n", sum);
 
-    MPI_Finalize();
+        end_time = MPI_Wtime(); 
+        printf("%f s\n", end_time - start_time); 
+    }
 
+    MPI_Finalize();
     free_vector(vector);
+
     return 0;
 }
 
