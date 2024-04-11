@@ -4,7 +4,8 @@
 
 int create_vector(int **vector, int vector_size);
 int free_vector(int *vector);
-void fill_vector(int **vector, int vector_size, int seed);
+void fill_vector(int *vector, int local_start, int local_end, int seed);
+int sum_part(int *vector, int local_start, int local_end);
 
 int main(int argc, char **argv){
     if(argc != 2)
@@ -14,28 +15,28 @@ int main(int argc, char **argv){
     int vector_size = atoi(argv[1]);
 
     create_vector(&vector, vector_size);
-    fill_vector(&vector, vector_size, 1);
 
-    int rank, size, tag, sum, local_sum = 0;
+    int rank, size, sum, local_sum;
     MPI_Status status;
 
     MPI_Init(&argc, &argv);
+
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+
     double start_time, end_time;
     if(rank == 0){
         start_time = MPI_Wtime(); 
     }
 
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &size);
 
     int elements_per_proc = vector_size/size;
     int remainder = vector_size%size;
     int local_elements = elements_per_proc + (rank < remainder);
     int local_start = (rank < remainder) ? rank * local_elements : rank * local_elements + remainder;
 
-    for(int i = local_start; i < local_start + local_elements; i++) {
-        local_sum += vector[i];
-    }
+    fill_vector(vector, local_start, local_elements, 1);
+    local_sum = sum_part(vector, local_start, local_elements);
 
     MPI_Reduce(&local_sum, &sum, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
 
@@ -69,10 +70,20 @@ int free_vector(int *vector){
     return 0;
 }
 
-void fill_vector(int **vector, int vector_size, int seed){
+void fill_vector(int *vector, int local_start, int local_end, int seed){
     srand(seed);
 
-    for(int i = 0; i < vector_size; i++){
-        (*vector)[i] = rand()%10;
+    for(int i = local_start; i < local_start + local_end; i++){
+        vector[i] = rand()%10;
     }
+}
+
+int sum_part(int *vector, int local_start, int local_end){
+    int local_sum = 0;
+
+    for(int i = local_start; i < local_start + local_end; i++) {
+        local_sum += vector[i];
+    }
+
+    return local_sum;
 }
