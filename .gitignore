@@ -1,3 +1,1 @@
 .vscode/*
-shared-memory-parallelism/tests/*
-!shared-memory-parallelism/tests/vect3d.c

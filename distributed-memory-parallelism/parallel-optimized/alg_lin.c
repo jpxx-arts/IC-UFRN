@@ -32,19 +32,17 @@ void set_matrix(int *matrix, int rows, int columns) {
 
 int create_identity(int **matrix, int rows, int columns) {
     (*matrix) = (int *) malloc(rows*columns * sizeof(int));
-    if ((*matrix) == NULL) {
+    if (*matrix == NULL){
         printf("Allocation error");
-        free(*matrix);
         return -1;
     }
 
-    #pragma omp parallel for collapse(2)
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j++) {
-            (*matrix)[(rows*i) + j] = (i == j);
+            (*matrix)[j + (i*columns)] = (i == j);
         }
     }
-    
+
     return 0;
 }
 
@@ -59,27 +57,23 @@ void show_matrix(int *matrix, int rows, int columns) {
 }
 
 int get_element(int *m1, int *m2, int row, int column, int tam) {
-    int sum = 0, x;
-
-    #pragma omp parallel for private(x) reduction(+ : sum)
-    for (x = 0; x < tam; x++) {
+    int sum = 0;
+    for (int x = 0; x < tam; x++) {
         sum += m1[(row*tam) + x] * m2[(x*tam) + column];
     }
-
     return sum;
 }
 
 int multiply_matrices(int *m1, int *m2, int *res, int m1Rows, int m1Columns, int m2Rows, int m2Columns) {
     if (m1Columns == m2Rows) {
-        #pragma omp parallel for collapse(2)
         for (int i = 0; i < m1Rows; i++) {
             for (int j = 0; j < m2Columns; j++) {
                 res[j + (i*m2Columns)] = get_element(m1, m2, i, j, m1Columns);
             }
-        }        
+        }
         return 0;
     } else {
-        printf("Multiplication Impossible");
+        printf("Impossible Multiplication");
         return -1;
     }
 }
@@ -87,7 +81,6 @@ int multiply_matrices(int *m1, int *m2, int *res, int m1Rows, int m1Columns, int
 void auto_fill(int **matrix, int rows, int columns, int seed){
     srand(seed);
 
-    #pragma omp parallel for collapse(2)
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j++) {
             (*matrix)[j + (i*columns)] = rand() % 10;
