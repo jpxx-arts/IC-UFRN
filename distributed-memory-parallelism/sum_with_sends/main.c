@@ -9,7 +9,7 @@ int sum_vect(int *vector, int size);
 void show_vect(int *vector, int size);
 
 int main(int argc, char **argv){
-    int rank, size, sum, local_sum;
+    int rank, size, sum, local_sum, tag = 0;
     MPI_Status status;
 
     MPI_Init(&argc, &argv);
@@ -43,17 +43,29 @@ int main(int argc, char **argv){
 
     int *sub_vector = NULL;
     create_vector(&sub_vector, local_elements);
-    MPI_Scatter(vector, elements_per_proc, MPI_INT, sub_vector, elements_per_proc, MPI_INT, 0, MPI_COMM_WORLD);
-    
+    if(rank == 0){
+        for(int i = 1; i < size; i++){
+            MPI_Send(&(vector[elements_per_proc*i]), elements_per_proc, MPI_INT, i, ++tag, MPI_COMM_WORLD);
+        }
+        printf("rank: %d tag: %d\n",rank,tag);
+        sub_vector = vector;
+    } else{
+        tag = rank;
+        MPI_Recv(sub_vector, elements_per_proc, MPI_INT, 0, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    }
+
+    show_vect(sub_vector, elements_per_proc);
+    MPI_Barrier(MPI_COMM_WORLD);
     local_sum = sum_vect(sub_vector, elements_per_proc);
     
     if(remainder != 0 && rank == 0){
         for(int i = 1; i <= remainder; i++){
-            MPI_Send(&(vector[elements_int+i-1]), 1, MPI_INT, i, i, MPI_COMM_WORLD);
+            MPI_Send(&(vector[elements_int+i-1]), 1, MPI_INT, i, tag++, MPI_COMM_WORLD);
         }
     } else if(remainder != 0 && rank <= remainder){
         int element_from_remainder;
-        MPI_Recv(&element_from_remainder, 1, MPI_INT, 0, rank, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        tag += rank;
+        MPI_Recv(&element_from_remainder, 1, MPI_INT, 0, tag++, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
         local_sum += element_from_remainder;
     }
