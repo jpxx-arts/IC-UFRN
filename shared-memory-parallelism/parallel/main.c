@@ -21,7 +21,7 @@ int main(int argc, char const *argv[]) {
     auto_fill(&m2, m2_rows, m2_columns, 2);
 
     int **res = NULL;
-    create_matrix(&res, m1_columns, m2_rows);
+    create_matrix(&res, m1_rows, m2_columns);
     multiply_matrices(m1, m2, res, m1_rows, m1_columns, m2_rows, m2_columns);
 
     free_matrix(m1, m1_rows);
