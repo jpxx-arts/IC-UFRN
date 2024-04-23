@@ -9,7 +9,7 @@ int sum_vect(int *vector, int size);
 void show_vect(int *vector, int size);
 
 int main(int argc, char **argv){
-    int rank, size, sum, local_sum, tag = 0;
+    int rank, size, sum, local_sum;
     MPI_Status status;
 
     MPI_Init(&argc, &argv);
@@ -24,7 +24,7 @@ int main(int argc, char **argv){
         }
     }
     MPI_Barrier(MPI_COMM_WORLD);
-
+    
     int vector_size = atoi(argv[1]);
     int *vector = NULL;
 
@@ -40,35 +40,39 @@ int main(int argc, char **argv){
     int elements_int = size*elements_per_proc;
     int remainder = vector_size%size;
     int local_elements = elements_per_proc + (rank < remainder);
-
-    int *sub_vector = NULL;
-    create_vector(&sub_vector, local_elements);
+    int element;
+    
     if(rank == 0){
-        for(int i = 1; i < size; i++){
-            MPI_Send(&(vector[elements_per_proc*i]), elements_per_proc, MPI_INT, i, ++tag, MPI_COMM_WORLD);
+        for(int current_rank = 1; current_rank < size; current_rank++){
+            for(int j = current_rank*elements_per_proc; j < current_rank*elements_per_proc + elements_per_proc; j++){
+                MPI_Send(&(vector[j]), 1, MPI_INT, current_rank, j + current_rank*elements_per_proc, MPI_COMM_WORLD);
+            }
         }
-        printf("rank: %d tag: %d\n",rank,tag);
-        sub_vector = vector;
+
+        for(int i = 0; i < elements_per_proc; i++){
+            local_sum += vector[i];
+        }
     } else{
-        tag = rank;
-        MPI_Recv(sub_vector, elements_per_proc, MPI_INT, 0, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        for(int j = rank*elements_per_proc; j < rank*elements_per_proc + elements_per_proc; j++){
+            MPI_Recv(&element, 1, MPI_INT, 0, j + rank*elements_per_proc, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            local_sum += element;
+        }
     }
 
-    show_vect(sub_vector, elements_per_proc);
-    MPI_Barrier(MPI_COMM_WORLD);
-    local_sum = sum_vect(sub_vector, elements_per_proc);
-    
-    if(remainder != 0 && rank == 0){
-        for(int i = 1; i <= remainder; i++){
-            MPI_Send(&(vector[elements_int+i-1]), 1, MPI_INT, i, tag++, MPI_COMM_WORLD);
+    if(rank == 0 && remainder){
+        local_sum += vector[elements_int];
+
+        for(int current_rank = 1; current_rank < remainder; current_rank++){
+            MPI_Send(&(vector[elements_int+current_rank]), 1, MPI_INT, current_rank, elements_int+current_rank, MPI_COMM_WORLD);
         }
-    } else if(remainder != 0 && rank <= remainder){
+    } else if(remainder && rank < remainder){
         int element_from_remainder;
-        tag += rank;
-        MPI_Recv(&element_from_remainder, 1, MPI_INT, 0, tag++, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        MPI_Recv(&element_from_remainder, 1, MPI_INT, 0, elements_int+rank, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
         local_sum += element_from_remainder;
     }
+
+    MPI_Barrier(MPI_COMM_WORLD);
 
     MPI_Reduce(&local_sum, &sum, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
 
